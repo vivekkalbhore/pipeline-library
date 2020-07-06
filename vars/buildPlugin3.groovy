@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 //TODO(oleg_nenashev): This thing is not simple anymore. I suggest reworking it to a config YAML
-// which would be compatible with essentials.yml (INFRA-1673)
+// which would be compatible with essentials.yml (infra2-1673)
 /**
  * Simple wrapper step for building a plugin
  */
@@ -61,7 +61,7 @@ def call(Map params = [:]) {
                         boolean incrementals // cf. JEP-305
 
                         stage("Checkout (${stageIdentifier})") {
-                            infra.checkoutSCM(repo)
+                            infra2.checkoutSCM(repo)
                             isMaven = fileExists('pom.xml')
                             incrementals = fileExists('.mvn/extensions.xml') &&
                                     readFile('.mvn/extensions.xml').contains('git-changelist-maven-extension')
@@ -120,7 +120,7 @@ def call(Map params = [:]) {
                                     mavenOptions += "checkstyle:checkstyle"
                                 }
                                 try {
-                                    infra.runMaven(mavenOptions, jdk, null, null, addToolEnv)
+                                    infra2.runMaven(mavenOptions, jdk, null, null, addToolEnv)
                                 } finally {
                                     if (!skipTests) {
                                         junit('**/target/surefire-reports/**/*.xml,**/target/failsafe-reports/**/*.xml,**/target/invoker-reports/**/*.xml')
@@ -142,7 +142,7 @@ def call(Map params = [:]) {
                                 }
 
                                 try {
-                                    infra.runWithJava(command, jdk, null, addToolEnv)
+                                    infra2.runWithJava(command, jdk, null, addToolEnv)
                                 } finally {
                                     if (!skipTests) {
                                         junit('**/build/test-results/**/*.xml')
@@ -212,7 +212,7 @@ def call(Map params = [:]) {
 
     parallel(tasks)
     if (publishingIncrementals) {
-        infra.maybePublishIncrementals()
+        infra2.maybePublishIncrementals()
     }
 }
 
